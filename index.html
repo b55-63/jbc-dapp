@@ -1,53 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JimmyBoss Collective (JBC)</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0d1117;
-      color: #ffffff;
-      text-align: center;
-      padding: 50px 20px;
-    }
-    h1 {
-      font-size: 3em;
-      color: #00ffa2;
-    }
-    p {
-      font-size: 1.2em;
-      color: #b3b3b3;
-    }
-    .button {
-      background-color: #00ffa2;
-      color: #0d1117;
-      padding: 15px 30px;
-      border: none;
-      font-size: 1em;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-    .button:hover {
-      background-color: #00c789;
-    }
-    footer {
-      margin-top: 80px;
-      color: #666;
-      font-size: 0.9em;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>JBC Dapp</title>
 </head>
 <body>
-  <h1>JimmyBoss Collective (JBC)</h1>
-  <p>The future of decentralized income. Earn. Share. Grow.</p>
-  <p><strong>Contract Address:</strong><br/>0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
-  <button class="button" onclick="alert('Wallet connect coming soon...')">Connect Wallet</button>
-  <footer>
-    &copy; 2025 JimmyBoss Collective. All rights reserved.
-  </footer>
+  <h1>JimmyBoss Collective</h1>
+  <button id="connect">Connect Wallet</button>
+  <p id="wallet-address"></p>
+
+  <script>
+    async function connectWallet() {
+      if (typeof window.ethereum !== "undefined") {
+        try {
+          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+          document.getElementById("wallet-address").innerText = "Wallet: " + accounts[0];
+        } catch (err) {
+          alert("Connection failed: " + err.message);
+        }
+      } else {
+        alert("MetaMask not found. Please install MetaMask.");
+      }
+    }
+
+    document.getElementById("connect").addEventListener("click", connectWallet);
+  </script>
 </body>
 </html>
