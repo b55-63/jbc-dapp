@@ -3,31 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <title>JimmyBoss Collective (JBC)</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    body { background-color: #0f0f0f; color: white; font-family: sans-serif; text-align: center; padding: 40px; }
+    button { padding: 10px 20px; font-size: 16px; background: lime; color: black; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+    p { margin-top: 20px; }
+  </style>
 </head>
-<body style="background-color:#0f0f0f; color:white; font-family:sans-serif; text-align:center; padding:50px;">
+<body>
   <h1 style="color:lime;">JimmyBoss Collective (JBC)</h1>
   <p>The future of decentralized income. Earn. Share. Grow.</p>
   <p><strong>Contract Address:</strong><br>0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
-  
-  <button id="connect" style="padding:10px 20px; font-size:16px; background:lime; color:black; border:none; border-radius:5px; cursor:pointer;">Connect Wallet</button>
-  <p id="wallet-address" style="margin-top:20px;"></p>
+
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="wallet-address"></p>
+  <p id="balance"></p>
 
   <script>
-    const connectButton = document.getElementById("connect");
-    const walletDisplay = document.getElementById("wallet-address");
+    const jbcAddress = "0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473";
+    const jbcABI = [
+      {
+        "constant":true,
+        "inputs":[{"name":"account","type":"address"}],
+        "name":"balanceOf",
+        "outputs":[{"name":"","type":"uint256"}],
+        "type":"function"
+      },
+      {
+        "constant":true,
+        "inputs":[],
+        "name":"decimals",
+        "outputs":[{"name":"","type":"uint8"}],
+        "type":"function"
+      }
+    ];
 
-    connectButton.addEventListener("click", async () => {
+    async function connectWallet() {
       if (window.ethereum) {
+        const web3 = new Web3(window.ethereum);
         try {
-          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-          walletDisplay.textContent = "Connected wallet: " + accounts[0];
-        } catch (err) {
-          walletDisplay.textContent = "Connection failed: " + err.message;
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          const accounts = await web3.eth.getAccounts();
+          const userAddress = accounts[0];
+          document.getElementById("wallet-address").innerText = "Connected wallet: " + userAddress;
+
+          const jbc = new web3.eth.Contract(jbcABI, jbcAddress);
+          const rawBalance = await jbc.methods.balanceOf(userAddress).call();
+          const decimals = await jbc.methods.decimals().call();
+          const formattedBalance = rawBalance / (10 ** decimals);
+
+          document.getElementById("balance").innerText = `JBC Balance: ${formattedBalance}`;
+        } catch (error) {
+          console.error("Wallet connection error:", error);
+          document.getElementById("wallet-address").innerText = "Connection failed.";
         }
       } else {
-        alert("MetaMask not found. Please install it.");
+        alert("MetaMask not detected. Please install MetaMask.");
       }
-    });
+    }
   </script>
 </body>
 </html>
