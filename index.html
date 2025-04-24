@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JBC Token DApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <style>
+    body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
+    button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+    #output { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Connect Wallet to JBC</h1>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <button onclick="getBalance()">Check JBC Balance</button>
+
+  <div id="output"></div>
+
+  <script>
+    const JBC_ADDRESS = "0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473"; // JBC Token address
+    const ABI = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function name() view returns (string)",
+      "function symbol() view returns (string)",
+      "function decimals() view returns (uint8)"
+    ];
+
+    let provider;
+    let signer;
+    let jbcContract;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        jbcContract = new ethers.Contract(JBC_ADDRESS, ABI, provider);
+        document.getElementById("output").innerText = "Wallet connected: " + await signer.getAddress();
+      } else {
+        alert("MetaMask not detected");
+      }
+    }
+
+    async function getBalance() {
+      if (!signer || !jbcContract) return alert("Connect wallet first");
+      const address = await signer.getAddress();
+      const balance = await jbcContract.balanceOf(address);
+      const decimals = await jbcContract.decimals();
+      const symbol = await jbcContract.symbol();
+      document.getElementById("output").innerText = `Balance: ${ethers.utils.formatUnits(balance, decimals)} ${symbol}`;
+    }
+  </script>
+</body>
+</html>
