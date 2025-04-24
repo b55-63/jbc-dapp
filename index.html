@@ -2,28 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JBC Dapp</title>
+  <title>JimmyBoss Collective (JBC)</title>
 </head>
-<body>
-  <h1>JimmyBoss Collective</h1>
-  <button id="connect">Connect Wallet</button>
-  <p id="wallet-address"></p>
+<body style="background-color:#0f0f0f; color:white; font-family:sans-serif; text-align:center; padding:50px;">
+  <h1 style="color:lime;">JimmyBoss Collective (JBC)</h1>
+  <p>The future of decentralized income. Earn. Share. Grow.</p>
+  <p><strong>Contract Address:</strong><br>0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
+  
+  <button id="connect" style="padding:10px 20px; font-size:16px; background:lime; color:black; border:none; border-radius:5px; cursor:pointer;">Connect Wallet</button>
+  <p id="wallet-address" style="margin-top:20px;"></p>
 
   <script>
-    async function connectWallet() {
-      if (typeof window.ethereum !== "undefined") {
+    const connectButton = document.getElementById("connect");
+    const walletDisplay = document.getElementById("wallet-address");
+
+    connectButton.addEventListener("click", async () => {
+      if (window.ethereum) {
         try {
-          const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-          document.getElementById("wallet-address").innerText = "Wallet: " + accounts[0];
+          const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+          walletDisplay.textContent = "Connected wallet: " + accounts[0];
         } catch (err) {
-          alert("Connection failed: " + err.message);
+          walletDisplay.textContent = "Connection failed: " + err.message;
         }
       } else {
-        alert("MetaMask not found. Please install MetaMask.");
+        alert("MetaMask not found. Please install it.");
       }
-    }
-
-    document.getElementById("connect").addEventListener("click", connectWallet);
+    });
   </script>
 </body>
 </html>
