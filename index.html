@@ -1,37 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>JimmyBoss Collective (JBC)</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body { background-color: #0f0f0f; color: white; font-family: sans-serif; text-align: center; padding-top: 100px; }
-    button { padding: 10px 20px; font-size: 16px; background-color: lime; color: black; border: none; cursor: pointer; border-radius: 8px; }
-    #walletAddress { margin-top: 20px; font-size: 14px; }
+    body {
+      background-color: #000;
+      color: lime;
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 60px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: lime;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    #balance {
+      margin-top: 20px;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h1 style="color:lime">JimmyBoss Collective (JBC)</h1>
+  <h1>JimmyBoss Collective (JBC)</h1>
   <p>The future of decentralized income. Earn. Share. Grow.</p>
   <p><strong>Contract Address:</strong><br>0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
 
   <button onclick="connectWallet()">Connect Wallet</button>
-  <p id="walletAddress"></p>
+  <p id="wallet-address"></p>
+  <p id="balance">Balance: </p>
 
   <script>
+    const jbcAddress = "0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473";
+    const jbcABI = [
+      {
+        "constant": true,
+        "inputs": [{"name": "account", "type": "address"}],
+        "name": "balanceOf",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [{"name": "", "type": "uint8"}],
+        "type": "function"
+      }
+    ];
+
+    let provider;
+    let signer;
+    let contract;
+
     async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const wallet = accounts[0];
-          document.getElementById('walletAddress').innerText = 'Connected wallet: ' + wallet;
-        } catch (error) {
-          console.error('User rejected the request or something went wrong');
-          alert('Connection failed. Please try again.');
-        }
+      if (typeof window.ethereum !== 'undefined') {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        const address = await signer.getAddress();
+        document.getElementById("wallet-address").innerText = `Connected wallet: ${address}`;
+
+        contract = new ethers.Contract(jbcAddress, jbcABI, provider);
+
+        const balanceRaw = await contract.balanceOf(address);
+        const decimals = await contract.decimals();
+        const balance = ethers.utils.formatUnits(balanceRaw, decimals);
+
+        document.getElementById("balance").innerText = `Balance: ${balance} JBC`;
       } else {
-        alert('MetaMask not detected. Please install MetaMask or use a Web3-enabled browser.');
+        alert("MetaMask not detected!");
       }
     }
   </script>
