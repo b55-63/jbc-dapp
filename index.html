@@ -2,54 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JimmyBoss Collective (JBC)</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3modal"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider"></script>
   <style>
     body {
       background-color: #0f0f0f;
       color: white;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 50px;
     }
-    h1 {
-      color: #00ff99;
-    }
+    h1 { color: lime; }
     button {
       padding: 12px 24px;
-      font-size: 16px;
-      background-color: #00cc88;
+      font-size: 18px;
+      background-color: #00ff99;
       border: none;
       border-radius: 6px;
       cursor: pointer;
     }
+    button:hover {
+      background-color: #00cc7a;
+    }
     #wallet-address {
       margin-top: 20px;
-      font-size: 14px;
-      color: #999;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <h1>JimmyBoss Collective (JBC)</h1>
   <p>The future of decentralized income. Earn. Share. Grow.</p>
-  <p><strong>Contract Address:</strong><br>0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
-  
+  <p><strong>Contract Address:</strong> 0xa9CC0D38E57dBEC771D7EaCd133d509E40cb6473</p>
   <button onclick="connectWallet()">Connect Wallet</button>
   <p id="wallet-address"></p>
 
   <script>
-    async function connectWallet() {
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const address = accounts[0];
-          document.getElementById('wallet-address').innerText = 'Connected: ' + address;
-        } catch (error) {
-          alert('Connection rejected by user.');
+    const providerOptions = {
+      walletconnect: {
+        package: window.WalletConnectProvider.default,
+        options: {
+          infuraId: "51f9e631fa2f4a13a9dbe0ec8d5fd6d1" // Public test Infura ID
         }
-      } else {
-        alert('MetaMask not found. Please install it.');
+      }
+    };
+
+    const web3Modal = new window.Web3Modal.default({
+      cacheProvider: false,
+      providerOptions
+    });
+
+    async function connectWallet() {
+      try {
+        const provider = await web3Modal.connect();
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        document.getElementById("wallet-address").innerText = "Connected: " + accounts[0];
+      } catch (err) {
+        alert("Connection failed: " + err.message);
+        console.error(err);
       }
     }
   </script>
