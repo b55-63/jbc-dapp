@@ -22,13 +22,14 @@
       if (window.ethereum) {
         try {
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          document.getElementById("wallet-address").innerText = "Connected: " + accounts[0];
-          console.log("Connected account:", accounts[0]);
+          const userAddress = accounts[0];
+          document.getElementById("wallet-address").innerText = "Connected: " + userAddress;
+          console.log("Connected:", userAddress);
         } catch (error) {
-          console.error("User rejected connection");
+          alert("Connection rejected by user.");
         }
       } else {
-        alert("MetaMask not found. Please install MetaMask extension.");
+        alert("MetaMask not detected. Please install MetaMask.");
       }
     }
   </script>
